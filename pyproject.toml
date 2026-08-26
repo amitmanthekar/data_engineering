@@ -1,0 +1,10 @@
+[project]
+name = "python-etl-pipeline"
+version = "0.1.0"
+description = "CSV/Excel to PostgreSQL batch ETL pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

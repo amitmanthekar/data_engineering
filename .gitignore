@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local pipeline artifacts (keep folders via .gitkeep)
+output/*
+!output/.gitkeep
+logs/*
+!logs/.gitkeep
+data/input/*
+!data/input/.gitkeep
