@@ -2,7 +2,7 @@
 
 A small, interview-style batch ETL project. It will read customer/order data from CSV or Excel, validate and transform it in Python, then load it into PostgreSQL.
 
-This repository is being built step by step. **Steps 1–2 are complete.** There is still no ETL logic — only a runnable skeleton and sample input files.
+This repository is being built step by step. **Steps 1–3 are complete.** Extract can read CSV/Excel into pandas. Validation and database loading are not implemented yet.
 
 ## Requirements
 
@@ -18,9 +18,10 @@ data/sample/orders.csv      # sample orders (CSV)
 data/sample/orders.xlsx     # same sample orders (Excel)
 generate_sample_data.py     # script that recreates the sample files
 output/                     # invalid records and quality reports
-logs/                       # pipeline.log (added in a later step)
-src/                        # Python package (ETL modules will live here)
-tests/                      # pytest tests (added in later steps)
+logs/                       # pipeline.log (extract already writes here)
+src/extract.py              # read CSV/Excel into a pandas DataFrame
+src/logger.py               # shared console + file logging
+tests/test_extract.py       # extract unit tests
 .env.example                # placeholder for secrets (copy to .env; never commit .env)
 requirements.txt
 pyproject.toml
@@ -105,7 +106,33 @@ python generate_sample_data.py
 
 Expected console output includes `Total records: 2500` and the issue counts above.
 
+## Extract (Step 3)
+
+Read a sample file into a pandas DataFrame (no validation yet):
+
+```powershell
+python -m src.extract data/sample/orders.csv
+python -m src.extract data/sample/orders.xlsx
+```
+
+You should see log lines like:
+
+```text
+2026-08-29 11:55:01 INFO Reading file: data/sample/orders.csv
+2026-08-29 11:55:01 INFO Extracted 2500 records
+```
+
+The same messages are appended to `logs/pipeline.log`.
+
+A missing file or an unsupported extension (for example `.json`) is logged as an error and the command exits with a non-zero status.
+
+Run extract tests:
+
+```powershell
+python -m pytest tests/test_extract.py
+```
+
 ## What comes next
 
-- **Step 3:** extract — read CSV/Excel into a pandas DataFrame
-- Later steps: validate, transform, load to PostgreSQL, quality report, optional AI summary, tests
+- **Step 4:** validate — apply business rules and split valid vs invalid rows
+- Later steps: transform, load to PostgreSQL, quality report, optional AI summary, more tests
