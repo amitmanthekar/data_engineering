@@ -2,7 +2,7 @@
 
 A small, interview-style batch ETL project. It will read customer/order data from CSV or Excel, validate and transform it in Python, then load it into PostgreSQL.
 
-This repository is being built step by step. **Step 1 is the project skeleton only.** There is no ETL logic yet.
+This repository is being built step by step. **Steps 1–2 are complete.** There is still no ETL logic — only a runnable skeleton and sample input files.
 
 ## Requirements
 
@@ -13,13 +13,15 @@ This repository is being built step by step. **Step 1 is the project skeleton on
 ## Project layout
 
 ```
-data/input/     # files you want the pipeline to process
-data/sample/    # sample datasets (added in Step 2)
-output/         # invalid records and quality reports
-logs/           # pipeline.log (added in a later step)
-src/            # Python package (ETL modules will live here)
-tests/          # pytest tests (added in later steps)
-.env.example    # placeholder for secrets (copy to .env; never commit .env)
+data/input/                 # files you want the pipeline to process
+data/sample/orders.csv      # sample orders (CSV)
+data/sample/orders.xlsx     # same sample orders (Excel)
+generate_sample_data.py     # script that recreates the sample files
+output/                     # invalid records and quality reports
+logs/                       # pipeline.log (added in a later step)
+src/                        # Python package (ETL modules will live here)
+tests/                      # pytest tests (added in later steps)
+.env.example                # placeholder for secrets (copy to .env; never commit .env)
 requirements.txt
 pyproject.toml
 ```
@@ -60,7 +62,50 @@ Expected output:
 ETL pipeline skeleton is ready. No data processing yet.
 ```
 
+## Sample data (Step 2)
+
+The pipeline will later read customer orders. Both files have the same 2,500 rows and the same columns:
+
+| Column | Meaning | Example |
+|--------|---------|---------|
+| `order_id` | Unique business key for an order | `10001` |
+| `customer_id` | Customer key | `C001` |
+| `customer_name` | Customer display name | `John Smith` |
+| `customer_email` | Customer email | `john@example.com` |
+| `order_date` | Order date (`YYYY-MM-DD` when valid) | `2026-08-01` |
+| `product_id` | Product key | `P1001` |
+| `product_name` | Product display name | `Laptop` |
+| `quantity` | Units ordered | `2` |
+| `unit_price` | Price per unit | `750.00` |
+| `order_status` | Allowed later: `PENDING`, `COMPLETED`, `CANCELLED`, `RETURNED` | `COMPLETED` |
+| `country` | Customer country | `USA` |
+
+Most rows are valid. These issues were added on purpose so validation can be demonstrated later:
+
+| Issue | Count |
+|-------|------:|
+| Missing `customer_email` | 35 |
+| Missing `customer_id` | 10 |
+| Invalid `order_date` | 8 |
+| Negative `quantity` | 10 |
+| Zero `quantity` | 5 |
+| Negative `unit_price` | 4 |
+| Missing `product_id` | 10 |
+| Invalid `order_status` | 10 |
+| Empty `customer_name` | 8 |
+| Duplicate `order_id` values | 12 |
+
+A few otherwise valid names also have extra spaces (for example `" John Smith "`) so a later transform step can trim them.
+
+Regenerate the files:
+
+```powershell
+python generate_sample_data.py
+```
+
+Expected console output includes `Total records: 2500` and the issue counts above.
+
 ## What comes next
 
-- **Step 2:** generate sample CSV and Excel order files with some invalid rows
-- Later steps: extract, validate, transform, load to PostgreSQL, quality report, optional AI summary, tests
+- **Step 3:** extract — read CSV/Excel into a pandas DataFrame
+- Later steps: validate, transform, load to PostgreSQL, quality report, optional AI summary, tests
